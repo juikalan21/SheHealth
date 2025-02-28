@@ -13,7 +13,7 @@ import seaborn as sns
 from matplotlib.gridspec import GridSpec
 import os 
 
-#Dataset
+#Dataset - jump to line 945 to skip the dataset
 data = [
   {
     "id": 1,
@@ -942,10 +942,10 @@ data = [
   }
 ]
 
-# Convert the JSON data to a pandas DataFrame
+# Converting the JSON data to a pandas DataFrame
 df = pd.DataFrame(data)
 
-# Extract relevant features
+# Extracting relevant features
 features = []
 for index, row in df.iterrows():
     features.append({
@@ -962,37 +962,37 @@ for index, row in df.iterrows():
 
 features_df = pd.DataFrame(features)
 
-# Standardize the features
+# Feature standardization - part of data processing
 scaler = StandardScaler()
 scaled_features = scaler.fit_transform(features_df)
 
 # Hierarchical CLustering Implementation
-# Split the data into training and testing sets
+# Spliting the data into training and testing sets
 X_train, X_test = train_test_split(scaled_features, test_size=0.2, random_state=42)
 
 # Hierarchical Clustering
-# Create and visualize the dendrogram to determine the optimal number of clusters
+# Creating dendrogram to determine the optimal number of clusters
 plt.figure(figsize=(12, 8))
 dendrogram = dendrogram(linkage(X_train, method='ward'))
 plt.title('Hierarchical Clustering Dendrogram')
 plt.xlabel('Sample index')
 plt.ylabel('Distance')
-plt.axhline(y=6, color='r', linestyle='--')  # Drawing a cutoff line
+plt.axhline(y=6, color='r', linestyle='--') 
 plt.show()
 
-# Based on the dendrogram, choose the number of clusters (let's say 4)
+# Based on the dendrogram, choose the number of clusters - 4 here
 n_clusters = 4
 hierarchical_model = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
 hierarchical_labels = hierarchical_model.fit_predict(X_train)
 
-# Evaluate the hierarchical clustering
+# Evaluating the hierarchical clustering
 silhouette_hierarchical = silhouette_score(X_train, hierarchical_labels)
 davies_bouldin_hierarchical = davies_bouldin_score(X_train, hierarchical_labels)
 
 print(f"Hierarchical Clustering - Silhouette Score: {silhouette_hierarchical:.4f}")
 print(f"Hierarchical Clustering - Davies-Bouldin Index: {davies_bouldin_hierarchical:.4f}")
 
-# Visualize the clusters with PCA
+# Visualizing the clusters with PCA
 pca = PCA(n_components=2)
 X_train_pca = pca.fit_transform(X_train)
 
@@ -1008,7 +1008,7 @@ plt.legend()
 plt.show()
 
 # Gaussian Mixture Model Implementation
-# Determine optimal number of components for GMM using BIC
+# Determining the optimal number of components for GMM using BIC
 n_components_range = range(1, 10)
 bic_scores = []
 for n_components in n_components_range:
@@ -1016,7 +1016,7 @@ for n_components in n_components_range:
     gmm.fit(X_train)
     bic_scores.append(gmm.bic(X_train))
 
-# Plot BIC scores
+# Plotting BIC scores
 plt.figure(figsize=(10, 6))
 plt.plot(n_components_range, bic_scores, marker='o')
 plt.title('BIC Scores for Different Numbers of Components')
@@ -1025,16 +1025,16 @@ plt.ylabel('BIC Score')
 plt.grid(True)
 plt.show()
 
-# Choose the number of components with the lowest BIC score
+# The number of components with the lowest BIC score
 optimal_n_components = n_components_range[np.argmin(bic_scores)]
 print(f"Optimal number of components based on BIC: {optimal_n_components}")
 
-# Train GMM with the optimal number of components
+# Training GMM with the optimal number of components
 gmm_model = GaussianMixture(n_components=optimal_n_components, random_state=42)
 gmm_model.fit(X_train)
 gmm_labels = gmm_model.predict(X_train)
 
-# Evaluate the GMM
+# Evaluating the GMM
 silhouette_gmm = silhouette_score(X_train, gmm_labels)
 davies_bouldin_gmm = davies_bouldin_score(X_train, gmm_labels)
 
@@ -1065,11 +1065,11 @@ plt.title('GMM Cluster Membership Probabilities (First 25 Samples)')
 plt.show()
 
 # Model Evaluation and Selection
-# Test both models on the test set
+# Both models on the test set
 hierarchical_test_labels = hierarchical_model.fit_predict(X_test)
 gmm_test_labels = gmm_model.predict(X_test)
 
-# Evaluate both models on the test set
+# Evaluating both models on the test set
 silhouette_hierarchical_test = silhouette_score(X_test, hierarchical_test_labels)
 davies_bouldin_hierarchical_test = davies_bouldin_score(X_test, hierarchical_test_labels)
 
@@ -1082,7 +1082,7 @@ print(f"Hierarchical Clustering - Davies-Bouldin Index: {davies_bouldin_hierarch
 print(f"GMM - Silhouette Score: {silhouette_gmm_test:.4f}")
 print(f"GMM - Davies-Bouldin Index: {davies_bouldin_gmm_test:.4f}")
 
-# Compare models and select the best one
+# Comparing models and selecting the best one
 if (silhouette_gmm_test > silhouette_hierarchical_test and 
     davies_bouldin_gmm_test < davies_bouldin_hierarchical_test):
     print("GMM is the better model based on test metrics.")
